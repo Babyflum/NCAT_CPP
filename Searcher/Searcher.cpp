@@ -259,9 +259,13 @@ postingsList exact_phrase(std::vector<postingsList>& phrase, bool leftbound)
   size_t current = 2;
   while (current != n)
     docIDList = intersect(docIDList, phrase[current++]);
-  if (docIDList.empty()) 
+  if (docIDList.empty())
+  {
+    std::cout << "No intersection for exact phrase." << std::endl;
     return result;
+  }
   // if we have matches in docID, we can begin the algorithm
+  std::cout << "Begin crazy exact phrase algorithm" << std::endl;
   for (postIt pit = docIDList.begin(); pit != docIDList.end(); pit++)
   {
     // pit refers to the docIDs in the intersection.
@@ -283,14 +287,15 @@ postingsList exact_phrase(std::vector<postingsList>& phrase, bool leftbound)
           k++;
         }
         if (match)
+        {
           leftbound ? result[pit->first].push_back((pit->second)[p+n-1]) : result[pit->first].push_back((pit->second)[p]); p += n;
+        }
         else 
           p++;
       } 
       else 
         p++;
     }
-  }
-  
+  } 
   return result;
 }
