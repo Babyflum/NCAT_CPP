@@ -10,7 +10,6 @@
 #include <algorithm>
 
 
-
 #define PRINT	std::cout << "Counter: " << counter \
 	<< "\nValue of step: " << *step << "\n" << \
 	"Value of beg: " << *beg << "\n" << "Value of afterword: " << \
@@ -347,12 +346,38 @@ namespace preprocessor
 	{
 		std::string result;
 		std::string::iterator step = query.begin();
+		std::string::iterator beg = step;
 		std::string::iterator end = query.end();
 
+		// move step until we find first character
+		while (*step == ' ') step++;
+		beg = step;
+
+		// now we move through the remaining query
 		while (step != end)
 		{
-			step++;
+			if (*step == ' ')
+			{
+				do {step++;} while (*step == ' ' && step != end);
+				result.append(" ");
+				beg = step;
+			}
+			else
+			{
+				do {step++;} while (*step != ' ' && step != end);
+				std::string temp(beg, step);
+				result.append(temp);
+				beg = step;
+			}
 		}
+
+		// move backwards through the result until we hit a character
+		std::string::iterator backresult = result.end();
+		do {backresult--;} while (*backresult == ' ');
+		backresult++;
+		result.assign(result.begin(), backresult);
+
+		return result;
 	}
 
 
@@ -363,14 +388,87 @@ namespace preprocessor
 	}
 
 
+	// since setOperators and normalizeWhitespace guarantee a certain structure,
+	// we simply have to break the string by whitespace.
 	std::vector<std::string> breakLine(std::string& query)
 	{
 		std::vector<std::string> result;
+		std::string::iterator beg = query.begin();
+		std::string::iterator step = beg;
+		std::string::iterator end = query.end();
+
+		while (step != end)
+		{
+			if (*step == '"')
+			{
+				do {step++;} while (*step != '"');
+				step++;
+				std::string temp(beg, step);
+				result.push_back(temp);
+				if (*step == ' ') step++;
+				beg = step;
+			}
+			else if (step == (query.end() - 1))
+			{
+				std::string temp(beg, step + 1);
+				result.push_back(temp);
+				step++;
+				beg = step;
+			}
+			else if (*step == ' ')
+			{
+				std::string temp(beg, step);
+				result.push_back(temp);
+				step++;
+				beg = step;
+			}
+			else
+			{
+				step++;
+			}
+		}
 		return result;
+	}
+
+
+	/*
+	We have two rules for legality:
+	1.) Opening and closing parentheses need to be balanced.
+		Also we cannot close a parenthesis that hasn't been opened.
+		This means the pcounter must be zero after we go through the query_vec.
+		And if at any time pcounter is below 0, we return false.
+	2.) A word is always followed by an operator,
+		an operator is always followed by a word.
+		The query always starts with a word and ends with a word.
+		We can guarantee all of that using two conditions.
+		If at any point opcounter is above 1 or below 0, break and return false.
+		If after the loop opcounter is anything but 1, return false.
+	*/
+	bool isOperator(std::string& term)
+	{
+		if (term == "AND" || term == "OR" || term == "NOT") return true;
+		else if (term.size() >= 5 && term.substr(0,4) == "NEAR" && std::isdigit(term[4])) return true;
+		else if (term.size() >= 7 && term.substr(0,6) == "WITHIN" && std::isdigit(term[6])) return true;
+		else return false;
 	}
 
 	bool testlegality(std::vector<std::string>& query_vec)
 	{
-		return true;
+		int pcounter = 0;
+		int opcounter = 0;
+		bool legal = true;
+
+		for (size_t i = 0; i != query_vec.size(); i++)
+		{
+			if (opcounter > 1 || opcounter < 0) return false;
+			else if (pcounter < 0) return false;
+			else if (query_vec[i] == "(") pcounter++;
+			else if (query_vec[i] == ")") pcounter--;
+			else if (preprocessor::isOperator(query_vec[i])) opcounter--;
+			else opcounter++;
+		}
+
+		if (pcounter != 0 || opcounter != 1) return false;
+		else return true;
 	}
 }
