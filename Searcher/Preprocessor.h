@@ -14,7 +14,7 @@ namespace preprocessor
 {
 	std::string setOperators(std::string&);
 	std::string normalizeWhitespace(std::string&);
-	std::string setParentheses(std::string&);
+	std::vector<std::string> setParentheses(std::vector<std::string>&);
 	std::vector<std::string> breakLine(std::string&);
 	bool testlegality(std::vector<std::string>&);
 }

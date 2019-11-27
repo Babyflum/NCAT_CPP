@@ -82,13 +82,13 @@ namespace preprocessor
 				}
 				// after while, step is at second '"';
 				step++;
-				afterword = true;
 				if (afterwhitespace == true && afterword == true)
 				{
 					std::string temp(beg, step);
 					temp = " AND " + temp + " ";
 					result.append(temp);
 					afterwhitespace = false;
+					afterword = true;
 					beg = step;
 					continue;
 				}
@@ -98,6 +98,7 @@ namespace preprocessor
 					temp = " " + temp + " ";
 					result.append(temp);
 					afterwhitespace = false;
+					afterword = true;
 					beg = step;
 					continue;
 				}
@@ -450,7 +451,6 @@ namespace preprocessor
 	{
 		int pcounter = 0;
 		int opcounter = 0;
-		bool legal = true;
 
 		for (size_t i = 0; i != query_vec.size(); i++)
 		{
@@ -470,11 +470,11 @@ namespace preprocessor
 	std::vector<std::string>::iterator returnWeakestOperator(std::vector<std::string>& query)
 	{
 		std::vector<std::string>::iterator pos = query.begin();
-		pcounter = 0;
+		unsigned int pcounter = 0;
 		while (pos != query.end())
 		{
-			if (query[i] == "(") {pcounter++; pos++; continue}
-			else if (query[i] == ")") {pcounter--; pos++; continue}
+			if (*pos == "(") {pcounter++; pos++; continue;}
+			else if (*pos == ")") {pcounter--; pos++; continue;}
 
 			if ((((*pos).substr(0,4) == "NEAR" && std::isdigit((*pos)[4])) ||
 				((*pos).substr(0,6) == "WITHIN" && std::isdigit((*pos)[6]))) &&
@@ -482,45 +482,49 @@ namespace preprocessor
 			{
 				return pos;
 			}
+			pos++;
 		}
 
-		std::vector<std::string>::iterator pos = query.begin();
+		pos = query.begin();
 		pcounter = 0;
 		while (pos != query.end())
 		{
-			if (query[i] == "(") {pcounter++; pos++; continue}
-			else if (query[i] == ")") {pcounter--; pos++; continue}
+			if (*pos == "(") {pcounter++; pos++; continue;}
+			else if (*pos == ")") {pcounter--; pos++; continue;}
 
 			if (*pos == "OR" && pcounter == 1)
 			{
 				return pos;
 			}
+			pos++;
 		}
 
-		std::vector<std::string>::iterator pos = query.begin();
+		pos = query.begin();
 		pcounter = 0;
 		while (pos != query.end())
 		{
-			if (query[i] == "(") {pcounter++; pos++; continue}
-			else if (query[i] == ")") {pcounter--; pos++; continue}
+			if (*pos == "(") {pcounter++; pos++; continue;}
+			else if (*pos == ")") {pcounter--; pos++; continue;}
 
 			if (*pos == "AND" && pcounter == 1)
 			{
 				return pos;
 			}
+			pos++;
 		}
 
-		std::vector<std::string>::iterator pos = query.begin();
+		pos = query.begin();
 		pcounter = 0;
 		while (pos != query.end())
 		{
-			if (query[i] == "(") {pcounter++; pos++; continue}
-			else if (query[i] == ")") {pcounter--; pos++; continue}
+			if (*pos == "(") {pcounter++; pos++; continue;}
+			else if (*pos == ")") {pcounter--; pos++; continue;}
 
 			if (*pos == "NOT" && pcounter == 1)
 			{
 				return pos;
 			}
+			pos++;
 		}
 
 		return pos;
@@ -528,15 +532,20 @@ namespace preprocessor
 
 
 	// for the functionality of setParentheses, query muss pass testlegality()
-	std::std::vector<std::string> setParentheses(std::vector<std::string>& query)
+	std::vector<std::string> setParentheses(std::vector<std::string>& query)
 	{
 		// if we reach the level of words, we simply return one level up
-		if (query.size() == 1)
+		std::cout << "Testing leaf level" << std::endl;
+		if (query.size() < 2)
+		{
+			std::cout << "Reached a leaf" << std::endl;
 			return query;
+		}
 
 		// check number of parentheses set
-		pcounter = 0
-		missing_parentheses = false;
+		std::cout << "Checking parentheses" << std::endl;
+		int pcounter = 0;
+		bool missing_parentheses = false;
 		for (size_t i = 0; i != query.size()-1; i++)
 		{
 			if (query[i] == "(") {pcounter++;}
@@ -549,33 +558,44 @@ namespace preprocessor
 					break;
 				}
 			}
+			if (pcounter == 0)
+			{
+				missing_parentheses = true;
+				break;
+			}
 		}
 		if (missing_parentheses == true)
 		{
+			std::cout << "Entering parentheses" << std::endl;
 			query.insert(query.begin(), "(");
 			query.push_back("(");
 		}
 
 		// find weakest operator at highest level.
+		std::cout << "Calling returnWeakestOperator()" << std::endl;
 		std::vector<std::string>::iterator pos = preprocessor::returnWeakestOperator(query);
-		if (pos = query.end())
+		if (pos == query.end())
 		{
+			std::cout << "returnWeakestOperator() returned past-the-end iterator" << std::endl;
 			std::vector<std::string> empty;
 			return empty;
 		}
 
 		// recursion
+		std::cout << "Left recursion" << std::endl;
 		std::vector<std::string> left_st(query.begin() + 1, pos);
-		left_st = setParentheses(left_st);
+		left_st = preprocessor::setParentheses(left_st);
 
+		std::cout << "Right recursion" << std::endl;
 		std::vector<std::string> right_st(pos + 1, query.end() - 1);
-		right_st = setParentheses(right_st);
+		right_st = preprocessor::setParentheses(right_st);
 
+		std::cout << "Concatenating vectors" << std::endl;
 		std::vector<std::string> result;
 		result.push_back("(");
-		result.insert(result.end(), left_st.begin(), left.end());
+		result.insert(result.end(), left_st.begin(), left_st.end());
 		result.push_back(*pos);
-		result.insert(result.end(), right_st.begin(), left_st.end());
+		result.insert(result.end(), right_st.begin(), right_st.end());
 		result.push_back(")");
 
 		return result;

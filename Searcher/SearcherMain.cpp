@@ -109,7 +109,7 @@ std::string idMaptransformer(std::vector<std::string>& v)
 int main()
 {
 	std::vector<std::vector<std::string> > all_queries;
-
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	std::string test_query1 = "Barack Obama";
 	std::cout << "\nQuery: " << test_query1 << std::endl;
 	std::string test_query_ops1 = preprocessor::setOperators(test_query1);
@@ -125,7 +125,7 @@ int main()
 	std::cout << std::endl;
 	std::cout << "Query is legal: ";
 	if (preprocessor::testlegality(test_query_broken1)) std::cout << "Yes" << std::endl;
-	else std::cout << "No" << std::endl; all_queries.push_back(test_query_broken1);
+	else {std::cout << "No" << std::endl; all_queries.push_back(test_query_broken1);}
 	std::vector<std::string> final_query1 = preprocessor::setParentheses(test_query_broken1);
 	std::cout << "Final query: ";
 	for (size_t i = 0; i != final_query1.size(); i++)
@@ -133,7 +133,7 @@ int main()
 		std::cout << final_query1[i] << ", ";
 	}
 	std::cout << std::endl;
-
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	std::string test_query2 = "Barack, Obama & Michelle~Obama";
 	std::cout << "\nQuery: " << test_query2 << std::endl;
 	std::string test_query_ops2 = preprocessor::setOperators(test_query2);
@@ -149,7 +149,7 @@ int main()
 	std::cout << std::endl;
 	std::cout << "Query is legal: ";
 	if (preprocessor::testlegality(test_query_broken2)) std::cout << "Yes" << std::endl;
-	else std::cout << "No" << std::endl; all_queries.push_back(test_query_broken2);
+	else {std::cout << "No" << std::endl; all_queries.push_back(test_query_broken2);}
 	std::vector<std::string> final_query2 = preprocessor::setParentheses(test_query_broken2);
 	std::cout << "Final query: ";
 	for (size_t i = 0; i != final_query2.size(); i++)
@@ -157,7 +157,7 @@ int main()
 		std::cout << final_query2[i] << ", ";
 	}
 	std::cout << std::endl;
-
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	std::string test_query3 = "(Barack N74 ( Michelle W24 Obama  WITHIN4 Barack) )NEAR8 Michelle NOT Hitler";
 	std::cout << "\nQuery: " << test_query3 << std::endl;
 	std::string test_query_ops3 = preprocessor::setOperators(test_query3);
@@ -173,7 +173,7 @@ int main()
 	std::cout << std::endl;
 	std::cout << "Query is legal: ";
 	if (preprocessor::testlegality(test_query_broken3)) std::cout << "Yes" << std::endl;
-	else std::cout << "No" << std::endl; all_queries.push_back(test_query_broken3);
+	else {std::cout << "No" << std::endl; all_queries.push_back(test_query_broken3);}
 	std::vector<std::string> final_query3 = preprocessor::setParentheses(test_query_broken3);
 	std::cout << "Final query: ";
 	for (size_t i = 0; i != final_query3.size(); i++)
@@ -181,7 +181,7 @@ int main()
 		std::cout << final_query3[i] << ", ";
 	}
 	std::cout << std::endl;
-
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	std::string test_query4 = "Barack Obama OR \"Barack Hussein Obama\"";
 	std::cout << "\nQuery: " << test_query4 << std::endl;
 	std::string test_query_ops4 = preprocessor::setOperators(test_query4);
@@ -197,7 +197,7 @@ int main()
 	std::cout << std::endl;
 	std::cout << "Query is legal: ";
 	if (preprocessor::testlegality(test_query_broken4)) std::cout << "Yes" << std::endl;
-	else std::cout << "No" << std::endl; all_queries.push_back(test_query_broken4);
+	else {std::cout << "No" << std::endl; all_queries.push_back(test_query_broken4);}
 	std::vector<std::string> final_query4 = preprocessor::setParentheses(test_query_broken4);
 	std::cout << "Final query: ";
 	for (size_t i = 0; i != final_query4.size(); i++)
@@ -205,7 +205,7 @@ int main()
 		std::cout << final_query4[i] << ", ";
 	}
 	std::cout << std::endl;
-
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 	/*
