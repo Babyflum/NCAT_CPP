@@ -17,4 +17,5 @@ namespace preprocessor
 	std::vector<std::string> setParentheses(std::vector<std::string>&);
 	std::vector<std::string> breakLine(std::string&);
 	bool testlegality(std::vector<std::string>&);
+	std::vector<std::string> run(std::string&);
 }

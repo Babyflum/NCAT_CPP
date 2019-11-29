@@ -49,48 +49,15 @@ typedef std::map<std::string, postingsList> InvertedIndex;
 typedef postingsList::iterator postIter;
 typedef std::map<int, std::vector<std::string> > idMap;
 
-std::vector<std::string> breakLine(std::string& query)
+
+void printQuery(std::vector<std::string>& query)
 {
-	std::vector<std::string> result;
-	std::string::iterator beg = query.begin();
-	std::string::iterator lim = beg;
-	std::string::iterator end = query.end();
-	while (lim != end)
+	std::cout << "[ ";
+	for (size_t i = 0; i != query.size() - 1; i++)
 	{
-		if (*lim == '"')
-		{
-			beg = lim;
-			lim++;
-			while (*lim != '"')
-			{
-				lim++;
-			}
-			lim++;
-			std::string temp(beg, lim);
-			result.push_back(temp);
-			beg = lim;
-		}
-		else if (std::isspace(*lim))
-		{
-			std::string temp(beg, lim);
-			result.push_back(temp);
-			lim++;
-			beg = lim;
-		} 
-		else if (*lim == '(' || *lim == ')')
-		{
-			std::string temp(1, *lim);
-			result.push_back(temp);
-			lim++;
-			beg = lim;
-		}
-		else lim++;
+		std::cout << query[i] << ", ";
 	}
-	// print what breakLine actually computes
-	std::cout << "Breakline for Query: ";
-	for (size_t i = 0; i != result.size(); i++) std::cout << result[i] << ", ";
-	std::cout << std::endl;
-	return result;
+	std::cout << query.back() << " ]" << std::endl;
 }
 
 
@@ -108,107 +75,6 @@ std::string idMaptransformer(std::vector<std::string>& v)
 
 int main()
 {
-	std::vector<std::vector<std::string> > all_queries;
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	std::string test_query1 = "Barack Obama";
-	std::cout << "\nQuery: " << test_query1 << std::endl;
-	std::string test_query_ops1 = preprocessor::setOperators(test_query1);
-	std::cout << "Query ops: " << test_query_ops1 << std::endl;
-	std::string test_query_normal1 = preprocessor::normalizeWhitespace(test_query_ops1);
-	std::cout << "Query normal: " << test_query_normal1 << std::endl;
-	std::vector<std::string> test_query_broken1 = preprocessor::breakLine(test_query_normal1);
-	std::cout << "Query broken up: ";
-	for (size_t i = 0; i != test_query_broken1.size(); i++)
-	{
-		std::cout << test_query_broken1[i] << ", ";
-	}
-	std::cout << std::endl;
-	std::cout << "Query is legal: ";
-	if (preprocessor::testlegality(test_query_broken1)) std::cout << "Yes" << std::endl;
-	else {std::cout << "No" << std::endl; all_queries.push_back(test_query_broken1);}
-	std::vector<std::string> final_query1 = preprocessor::setParentheses(test_query_broken1);
-	std::cout << "Final query: ";
-	for (size_t i = 0; i != final_query1.size(); i++)
-	{
-		std::cout << final_query1[i] << ", ";
-	}
-	std::cout << std::endl;
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	std::string test_query2 = "Barack, Obama & Michelle~Obama";
-	std::cout << "\nQuery: " << test_query2 << std::endl;
-	std::string test_query_ops2 = preprocessor::setOperators(test_query2);
-	std::cout << "Query ops: " << test_query_ops2 << std::endl;
-	std::string test_query_normal2 = preprocessor::normalizeWhitespace(test_query_ops2);
-	std::cout << "Query normal: " << test_query_normal2 << std::endl;
-	std::vector<std::string> test_query_broken2 = preprocessor::breakLine(test_query_normal2);
-	std::cout << "Query broken up: ";
-	for (size_t i = 0; i != test_query_broken2.size(); i++)
-	{
-		std::cout << test_query_broken2[i] << ", ";
-	}
-	std::cout << std::endl;
-	std::cout << "Query is legal: ";
-	if (preprocessor::testlegality(test_query_broken2)) std::cout << "Yes" << std::endl;
-	else {std::cout << "No" << std::endl; all_queries.push_back(test_query_broken2);}
-	std::vector<std::string> final_query2 = preprocessor::setParentheses(test_query_broken2);
-	std::cout << "Final query: ";
-	for (size_t i = 0; i != final_query2.size(); i++)
-	{
-		std::cout << final_query2[i] << ", ";
-	}
-	std::cout << std::endl;
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	std::string test_query3 = "(Barack N74 ( Michelle W24 Obama  WITHIN4 Barack) )NEAR8 Michelle NOT Hitler";
-	std::cout << "\nQuery: " << test_query3 << std::endl;
-	std::string test_query_ops3 = preprocessor::setOperators(test_query3);
-	std::cout << "Query ops: " << test_query_ops3 << std::endl;
-	std::string test_query_normal3 = preprocessor::normalizeWhitespace(test_query_ops3);
-	std::cout << "Query normal: " << test_query_normal3 << std::endl;
-	std::vector<std::string> test_query_broken3 = preprocessor::breakLine(test_query_normal3);
-	std::cout << "Query broken up: ";
-	for (size_t i = 0; i != test_query_broken3.size(); i++)
-	{
-		std::cout << test_query_broken3[i] << ", ";
-	}
-	std::cout << std::endl;
-	std::cout << "Query is legal: ";
-	if (preprocessor::testlegality(test_query_broken3)) std::cout << "Yes" << std::endl;
-	else {std::cout << "No" << std::endl; all_queries.push_back(test_query_broken3);}
-	std::vector<std::string> final_query3 = preprocessor::setParentheses(test_query_broken3);
-	std::cout << "Final query: ";
-	for (size_t i = 0; i != final_query3.size(); i++)
-	{
-		std::cout << final_query3[i] << ", ";
-	}
-	std::cout << std::endl;
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	std::string test_query4 = "Barack Obama OR \"Barack Hussein Obama\"";
-	std::cout << "\nQuery: " << test_query4 << std::endl;
-	std::string test_query_ops4 = preprocessor::setOperators(test_query4);
-	std::cout << "Query ops: " << test_query_ops4 << std::endl;
-	std::string test_query_normal4 = preprocessor::normalizeWhitespace(test_query_ops4);
-	std::cout << "Query normal: " << test_query_normal4 << std::endl;
-	std::vector<std::string> test_query_broken4 = preprocessor::breakLine(test_query_normal4);
-	std::cout << "Query broken up: ";
-	for (size_t i = 0; i != test_query_broken4.size(); i++)
-	{
-		std::cout << test_query_broken4[i] << ", ";
-	}
-	std::cout << std::endl;
-	std::cout << "Query is legal: ";
-	if (preprocessor::testlegality(test_query_broken4)) std::cout << "Yes" << std::endl;
-	else {std::cout << "No" << std::endl; all_queries.push_back(test_query_broken4);}
-	std::vector<std::string> final_query4 = preprocessor::setParentheses(test_query_broken4);
-	std::cout << "Final query: ";
-	for (size_t i = 0; i != final_query4.size(); i++)
-	{
-		std::cout << final_query4[i] << ", ";
-	}
-	std::cout << std::endl;
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-	/*
 	// load Index
 	std::ifstream in("InvertedIndex");
 	InvertedIndex ii;
@@ -227,7 +93,7 @@ int main()
 		boost::archive::binary_iarchive ia(inidMap);
 		ia >> im;
 	}
-	std::cout << "Inverted Index loaded\n" << std::endl;
+	std::cout << "idMap loaded\n" << std::endl;
 
 	// transform idMap into corpus
 	typedef std::map<int, std::string> corpus;
@@ -240,42 +106,46 @@ int main()
 		Corpus[j->first] = idMaptransformer(j->second);
 	}
 
-	// ask user for query
-	size_t i = 0;
-	while (i < all_queries.size())
+
+	while (true)
 	{
-		
-		std::cout << "THIS IS JUST A TEST SEARCH: ENTER ONLY WITH PROPER PARENTHESES!!!\n";
 		std::cout << "Search: ";
 		std::string input;
 		std::getline(std::cin, input);
 		if (input == "") break;
-		std::cout << std::endl;
-		if (input.back() == ')') ;
-		else input = input + " ";
 
 		// preprocess query (right now, we will only use breakline)
 		std::cout << "Preprocessing Query" << std::endl;
-		std::vector<std::string> query = breakLine(input);
-		
+		std::vector<std::string> processed_query = preprocessor::run(input);
+		printQuery(processed_query);
 
+		postingsList result;
+
+		if (processed_query.empty())
+		{
+			std::cout << "Something went wrong.\n" << std::endl;
+			continue;
+		}
+		else if (processed_query.size() == 1)
+		{
+			processed_query.push_back("OR");
+			processed_query.push_back(" ");
+		}
 		// generate SearchTree
 		SearchTree st;
-		std::cout << "Generating Search Tree" << std::endl;
-		st.generate(all_queries[i]);
+		std::cout << "\nGenerating Search Tree" << std::endl;
+		st.generate(processed_query);
 		std::cout << "\nEvaluating search tree" << std::endl;
-		postingsList result = st.evaluate(ii);
+		result = st.evaluate(ii);
 		if (result.empty()) std::cout << "Nothing to see here" << std::endl;
 		else
 		{ 
 			std::cout << "Found something" << std::endl;
 			int counter = 0;
-			corit corbegit = Corpus.begin();
-			corit corendit = Corpus.end();
 			postIter postbegit = result.begin();
 			postIter postendit = result.end();
 
-			while (counter != 3 && postbegit != postendit)
+			while (counter != 5 && postbegit != postendit)
 			{
 				std::cout << "\n" << Corpus[postbegit->first] << std::endl;
 				std::cout << "\n" << im[postbegit->first][0] << std::endl;
@@ -283,9 +153,7 @@ int main()
 				postbegit++;
 			}
 		}
-		i++;
 	}
 	std::cout << "\nCleaning up!\nThank you for using NCAT" << std::endl;
 	return 0;
-	*/
 }

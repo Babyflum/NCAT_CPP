@@ -35,6 +35,7 @@ namespace preprocessor
 		std::string::iterator end = query.end();  // this iterator marks the end of the query
 		bool afterword = false;
 		bool afterwhitespace = false;
+		bool nodist = false;
 		int counter = 0;
 
 		// we go through the entire query until we reach the end
@@ -48,6 +49,7 @@ namespace preprocessor
 				step++;
 				beg = step;
 				afterwhitespace = true;
+				nodist = false;
 				continue;
 			}  // END whitespace
 
@@ -57,6 +59,7 @@ namespace preprocessor
 				result.append(" ( ");
 				afterword = false;
 				afterwhitespace = false;
+				nodist = false;
 				step++;
 				beg = step;
 				continue;
@@ -66,6 +69,7 @@ namespace preprocessor
 				result.append(" ) ");
 				afterword = false;
 				afterwhitespace = false;
+				nodist = false;
 				step++;
 				beg = step;
 				continue;
@@ -89,6 +93,7 @@ namespace preprocessor
 					result.append(temp);
 					afterwhitespace = false;
 					afterword = true;
+					nodist = false;
 					beg = step;
 					continue;
 				}
@@ -99,6 +104,7 @@ namespace preprocessor
 					result.append(temp);
 					afterwhitespace = false;
 					afterword = true;
+					nodist = false;
 					beg = step;
 					continue;
 				}
@@ -110,6 +116,7 @@ namespace preprocessor
 				result.append(" AND ");
 				afterword = false;
 				afterwhitespace = false;
+				nodist = false;
 				step++;
 				beg = step;
 				continue;
@@ -119,6 +126,7 @@ namespace preprocessor
 				result.append(" OR ");
 				afterword = false;
 				afterwhitespace = false;
+				nodist = false;
 				step++;
 				beg = step;
 				continue;
@@ -128,6 +136,7 @@ namespace preprocessor
 				result.append(" NOT ");
 				afterword = false;
 				afterwhitespace = false;
+				nodist = false;
 				step++;
 				beg = step;
 				continue;
@@ -139,6 +148,7 @@ namespace preprocessor
 				result.append(" AND ");
 				afterword = false;
 				afterwhitespace = false;
+				nodist = false;
 				step += 3;
 				beg = step;
 				continue;
@@ -148,6 +158,7 @@ namespace preprocessor
 				result.append(" OR ");
 				afterword = false;
 				afterwhitespace = false;
+				nodist = false;
 				step += 2;
 				beg = step;
 				continue;
@@ -157,13 +168,14 @@ namespace preprocessor
 				result.append(" NOT ");
 				afterword = false;
 				afterwhitespace = false;
+				nodist = false;
 				step += 3;
 				beg = step;
 				continue;
 			}  // END AND, OR, NOT
 
 			// check NEARd and WITHINd
-			else if (*step == 'N')
+			else if (*step == 'N' && nodist == false)
 			{
 				// N with digits after it
 				if (std::isdigit(*(step+1)))
@@ -178,6 +190,7 @@ namespace preprocessor
 						beg = step;
 						afterword = false;
 						afterwhitespace = false;
+						nodist = false;
 						continue;
 					}
 					// N with 1 digit after it
@@ -190,6 +203,7 @@ namespace preprocessor
 						beg = step;
 						afterword = false;
 						afterwhitespace = false;
+						nodist = false;
 						continue;
 					}
 				}
@@ -208,6 +222,7 @@ namespace preprocessor
 							beg = step;
 							afterword = false;
 							afterwhitespace = false;
+							nodist = false;
 							continue;
 						}
 						// NEAR with 1 digit after it
@@ -220,6 +235,7 @@ namespace preprocessor
 							beg = step;
 							afterword = false;
 							afterwhitespace = false;
+							nodist = false;
 							continue;
 						}
 					}
@@ -232,12 +248,14 @@ namespace preprocessor
 						beg = step;
 						afterword = false;
 						afterwhitespace = false;
+						nodist = false;
 						continue;
 					}
 				}
+				nodist = true;
 			}  // END NEARd
 
-			else if (*step == 'W')
+			else if (*step == 'W' && nodist == false)
 			{
 				if (std::isdigit(*(step+1)))
 				{
@@ -251,6 +269,7 @@ namespace preprocessor
 						beg = step;
 						afterword = false;
 						afterwhitespace = false;
+						nodist = false;
 						continue;
 					}
 					// W with 1 digit after it
@@ -263,6 +282,7 @@ namespace preprocessor
 						beg = step;
 						afterword = false;
 						afterwhitespace = false;
+						nodist = false;
 						continue;
 					}
 				}
@@ -280,6 +300,7 @@ namespace preprocessor
 							beg = step;
 							afterword = false;
 							afterwhitespace = false;
+							nodist = false;
 							continue;
 						}
 						else
@@ -291,6 +312,7 @@ namespace preprocessor
 							beg = step;
 							afterword = false;
 							afterwhitespace = false;
+							nodist = false;
 							continue;
 						}
 					}
@@ -303,9 +325,11 @@ namespace preprocessor
 						beg = step;
 						afterword = false;
 						afterwhitespace = false;
+						nodist = false;
 						continue;
 					}
 				}
+				nodist = true;
 			}  // END WITHINd
 
 			// now look at words
@@ -323,6 +347,7 @@ namespace preprocessor
 					result.append(temp);
 					afterwhitespace = false;
 					afterword = true;
+					nodist = false;
 					beg = step;
 					continue;
 				}
@@ -333,6 +358,7 @@ namespace preprocessor
 					result.append(temp);
 					afterwhitespace = false;
 					afterword = true;
+					nodist = false;
 					beg = step;
 					continue;
 				}
@@ -599,5 +625,25 @@ namespace preprocessor
 		result.push_back(")");
 
 		return result;
+	}
+
+	std::vector<std::string> run(std::string& query)
+	{
+		std::string sRes = preprocessor::setOperators(query);
+		sRes = preprocessor::normalizeWhitespace(sRes);
+
+		std::vector<std::string> vRes = preprocessor::breakLine(sRes);
+		if (!preprocessor::testlegality(vRes))
+		{
+			vRes.clear();
+			return vRes;
+		}
+		else
+		{
+			vRes = preprocessor::setParentheses(vRes);
+			std::vector<std::string> result;
+			result.insert(result.begin(), vRes.begin() + 1, vRes.end() - 1);
+			return result;
+		}
 	}
 }
