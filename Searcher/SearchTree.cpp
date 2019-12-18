@@ -328,7 +328,7 @@ int getOperatorType(std::string& op) {
 
 
 // evaluate the tree
-std::map<int, std::vector<int> > SearchTree::evaluate(InvertedIndex& ii) 
+std::map<int, std::vector<int> > SearchTree::evaluate(InvertedIndex& ii, bool leftbound) 
 {
   std::cout << "Type of current is " << current->type << std::endl;
   std::cout << "Value of current is " << current->key << std::endl;
@@ -354,7 +354,7 @@ std::map<int, std::vector<int> > SearchTree::evaluate(InvertedIndex& ii)
     }
     // for the boolean value we also need to check if current is a left or right child.
     std::cout << "Calling exact_phrase(): " << std::endl;
-    postingsList result = ::exact_phrase(ep_input, true);
+    postingsList result = ::exact_phrase(ep_input, leftbound);
     std::cout << "exact_phrase() ran succesfully." << std::endl;
     return result;
   } 
@@ -368,7 +368,7 @@ std::map<int, std::vector<int> > SearchTree::evaluate(InvertedIndex& ii)
       case 2 : std::cout << current->key << " is recognized as OR" << std::endl; break;
       case 3 : std::cout << current->key << " is recognized as NOT" << std::endl; break;
     }
-    if (op_type > 99 &&  op_type < 200)
+    if (op_type > 99 && op_type < 200)
     {
       std::cout << current->key << " is recognized as NEAR with distance " << (op_type - 100) << std::endl;
     }
@@ -378,14 +378,14 @@ std::map<int, std::vector<int> > SearchTree::evaluate(InvertedIndex& ii)
     }
 
     current = current->left;
-    std::cout << "Evaluating left subtree." << std::endl; 
-    postingsList left = evaluate(ii);
+    std::cout << "Evaluating left subtree." << std::endl;
+    postingsList left = evaluate(ii, true);
     std::cout << "Evaluating right subtree." << std::endl;
     current = current->parent->right;
-    postingsList right = evaluate(ii);
+    postingsList right = evaluate(ii, false);
     std::cout << "Moving in with parents." << std::endl;
     current = current->parent;
-    if (op_type == 1) 
+    if (op_type == 1)
     {
       std::cout << "Calling intersect()" << std::endl;
     	postingsList result = ::intersect(left, right);
@@ -408,7 +408,7 @@ std::map<int, std::vector<int> > SearchTree::evaluate(InvertedIndex& ii)
     	// for the boolean value we also need to check if current is a left or right child.
     	int dist = op_type - 200;
       std::cout << "Calling proximity() with WITHIN" << std::endl;
-    	postingsList result = ::proximity(left, right, dist, true, 0);
+    	postingsList result = ::proximity(left, right, dist, leftbound, 0);
     	return result;
     } 
     else if (op_type >= 100) 
@@ -416,7 +416,7 @@ std::map<int, std::vector<int> > SearchTree::evaluate(InvertedIndex& ii)
     	// for the boolean value we also neet to check if current is a left or right child.
     	int dist = op_type - 100;
       std::cout << "Calling proximity() with NEAR" << std::endl;
-    	postingsList result = ::proximity(left, right, dist, true, 1);
+    	postingsList result = ::proximity(left, right, dist, leftbound, 1);
     	return result;
     } 
     else

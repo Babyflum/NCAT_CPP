@@ -19,7 +19,7 @@ postingsList retrieve(std::string& term, InvertedIndex& ii)
 {
 	std::cout << "retrieve() is trying to retrieve " << term << std::endl;
 	postingsList empty;
-	if (ii.find(term) == ii.end())
+	if (ii.find(term) == ii.end() || term == " ")
 	{
 		std::cout << "Term cannot be found\n" << std::endl;
 		return empty;

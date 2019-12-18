@@ -111,7 +111,7 @@ postingsList unionize(postingsList& left, postingsList& right)
   postingsList result;
   postIt leftIt = left.begin();
   postIt rightIt = right.begin();
-  while (leftIt != left.end() && rightIt != right.end()) 
+  while (leftIt != left.end() && rightIt != right.end())
   {
     if (leftIt->first == rightIt->first) 
     {
@@ -205,10 +205,12 @@ postingsList proximity(postingsList& left, postingsList& right, int dist, bool l
       VecIt pr = right[pit->first].begin();
       while (pl != left[pit->first].end() && pr != right[pit->first].end()) 
       {
-        if (*pr < *pl) 
+        if (*pr < *pl)
           pr++;
         else if (*pr-*pl > dist)
+        {
           pl++;
+        }
         else 
         {
           leftbound ? result[pit->first].push_back(*pr) : result[pit->first].push_back(*pl);

@@ -27,6 +27,16 @@ bool isEndWord(const char c)
 
 namespace preprocessor 
 {
+	void printQuery(std::vector<std::string>& query)
+	{
+		std::cout << "[ ";
+		for (size_t i = 0; i != query.size() - 1; i++)
+		{
+			std::cout << query[i] << ", ";
+		}
+		std::cout << query.back() << " ]" << std::endl;
+	}	
+
 	std::string setOperators(std::string& query)
 	{
 		std::string result;
@@ -594,7 +604,7 @@ namespace preprocessor
 		{
 			std::cout << "Entering parentheses" << std::endl;
 			query.insert(query.begin(), "(");
-			query.push_back("(");
+			query.push_back(")");
 		}
 
 		// find weakest operator at highest level.
@@ -630,19 +640,35 @@ namespace preprocessor
 	std::vector<std::string> run(std::string& query)
 	{
 		std::string sRes = preprocessor::setOperators(query);
+		std::cout << "Query with Operators: " << sRes << std::endl;
 		sRes = preprocessor::normalizeWhitespace(sRes);
+		std::cout << "Query with normalized whitespace: " << sRes << std::endl;
 
 		std::vector<std::string> vRes = preprocessor::breakLine(sRes);
+		std::cout << "Query with breakline: ";
+		preprocessor::printQuery(vRes);
+
 		if (!preprocessor::testlegality(vRes))
 		{
+			std::cout << "Query is illegal." << std::endl;
 			vRes.clear();
 			return vRes;
 		}
 		else
 		{
+			std::cout << "Query is legal." << std::endl;
 			vRes = preprocessor::setParentheses(vRes);
+			std::cout << "Query with parentheses: ";
+			preprocessor::printQuery(vRes);
 			std::vector<std::string> result;
-			result.insert(result.begin(), vRes.begin() + 1, vRes.end() - 1);
+			if (vRes.size() > 1)
+			{
+				result.insert(result.begin(), vRes.begin() + 1, vRes.end() - 1);
+			}
+			else
+			{
+				result = vRes;
+			}
 			return result;
 		}
 	}

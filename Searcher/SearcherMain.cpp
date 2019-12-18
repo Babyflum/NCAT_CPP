@@ -147,8 +147,9 @@ int main()
 
 			while (counter != 5 && postbegit != postendit)
 			{
+				std::cout << "Term contained " << (postbegit->second).size() << " time(s) in document " << postbegit->first << std::endl;
 				std::cout << "\n" << Corpus[postbegit->first] << std::endl;
-				std::cout << "\n" << im[postbegit->first][0] << std::endl;
+				std::cout << "\n" << std::endl;
 				counter++;
 				postbegit++;
 			}

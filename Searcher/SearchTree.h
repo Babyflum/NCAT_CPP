@@ -74,7 +74,7 @@ class SearchTree {
   // this method is used for the inputVector-Constructor.
   void generate(std::vector<std::string>&);
   // method to get a positionalPostingsList according to the operator hierarchy
-  std::map<int, std::vector<int> > evaluate(std::map<std::string, std::map<int, std::vector<int> > >&);
+  std::map<int, std::vector<int> > evaluate(std::map<std::string, std::map<int, std::vector<int> > >&, bool leftbound=true);
 };
 
 // declaration of helper functions
