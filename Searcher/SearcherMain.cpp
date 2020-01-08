@@ -101,6 +101,15 @@ int main()
 	typedef idMap::iterator idMapit;
 	corpus Corpus;
 
+	std::ifstream inDB("database");
+	corpus DB;
+	{
+		std::cout << "Database loading" << std::endl;
+		boost::archive::binary_iarchive ia(inDB);
+		ia >> DB;
+	}
+	std::cout << "Inverted Index loaded\n" << std::endl;
+
 	for (idMapit j = im.begin(); j != im.end(); j++)
 	{
 		Corpus[j->first] = idMaptransformer(j->second);
@@ -149,6 +158,8 @@ int main()
 			{
 				std::cout << "Term contained " << (postbegit->second).size() << " time(s) in document " << postbegit->first << std::endl;
 				std::cout << "\n" << Corpus[postbegit->first] << std::endl;
+				std::cout << "\n" << std::endl;
+				std::cout << DB[postbegit->first] << std::endl;
 				std::cout << "\n" << std::endl;
 				counter++;
 				postbegit++;

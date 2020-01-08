@@ -273,7 +273,7 @@ postingsList exact_phrase(std::vector<postingsList>& phrase, bool leftbound)
     // pit refers to the docIDs in the intersection.
     unsigned int p = 0;
     // p is the position in the intersect-vector for a particular docID
-    while (p+n < (pit->second).size() && p < (pit->second).size()) 
+    while (p+n <= (pit->second).size() && p <= (pit->second).size()) 
     {
       if ((pit->second)[p] + (n-1) == (pit->second)[p+n-1])
       {

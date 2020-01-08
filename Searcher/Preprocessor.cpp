@@ -66,6 +66,10 @@ namespace preprocessor
 			// check for parentheses.
 			else if (*step == '(')
 			{
+				if (afterwhitespace == true && afterword == true)
+				{
+					result.append(" AND ");
+				}
 				result.append(" ( ");
 				afterword = false;
 				afterwhitespace = false;
