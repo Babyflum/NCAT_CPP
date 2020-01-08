@@ -1,4 +1,4 @@
-Ind// Copyright 2018, Uni Freiburg
+// Copyright 2018, Uni Freiburg
 // Fatlum Sadiku, <fatlumsadiku91@gmail.com>
 
 // standard headers

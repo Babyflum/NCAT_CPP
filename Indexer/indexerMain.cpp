@@ -36,6 +36,14 @@ int main()
     std::cout << "Caught an error" << std::endl;
     return 1;
   }
+
+  // serialize idMap to binary file
+  std::ofstream outidMap("idMap");
+
+  {
+    boost::archive::binary_oarchive oa(outidMap);
+    oa << idMap;
+  }
   
   typedef std::map<std::string, std::map<int, std::vector<int> > > InvertedIndex;
   // typedef InvertedIndex::iterator iiIter;
@@ -53,10 +61,10 @@ int main()
   std::cout << duration.count() << "s " << std::endl;
 
   // serialize index to binary file
-  std::ofstream out("InvertedIndex");
+  std::ofstream outii("InvertedIndex");
 
   {
-    boost::archive::binary_oarchive oa(out);
+    boost::archive::binary_oarchive oa(outii);
     oa << ii;
   }
 

@@ -16,9 +16,17 @@
 #include <stdexcept>
 #include <algorithm>
 
+// boost headers
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/vector.hpp>
+
 
 typedef std::vector<std::vector<std::string> > lineVec;
-typedef std::map<int, std::vector<std::string> > idMap; 
+typedef std::map<int, std::vector<std::string> > idMap;
+typedef std::map<int, std::string> database;
 
 
 // from the list element read the line and split it into its columns
@@ -155,7 +163,7 @@ generate a map that contains the docIDs as keys (converted to int) and the
 words in the doc as a container with the elements being the words
 needs a split function that separates all words.
 */
-idMap genMap(lineVec& lv) 
+idMap genMap(lineVec& lv, database& DB) 
 {
   idMap result;
   typedef lineVec::iterator lviter;
@@ -163,6 +171,7 @@ idMap genMap(lineVec& lv)
   for (lviter it = lv.begin(); it != lv.end(); it++) 
   {
     int n = std::stoi((*it)[0]);
+    DB[n] = (*it)[8];
     std::vector<std::string> vec = split((*it)[8]);
     result[n] = vec;
   }
@@ -176,8 +185,10 @@ the input is the name of the CSV file
 return an idMap containing the docIDs as keys
 and vectors with words per docID as elements.
 */
-idMap RunMain(std::string& name) 
+idMap RunMain(std::string name)
 {
+  database DB;
+
   std::ifstream infile;
   infile.open(name);
   lineVec lines;
@@ -192,6 +203,13 @@ idMap RunMain(std::string& name)
     throw std::domain_error("infile doesn't exist");
   }
 
-  idMap result = genMap(lines);
+  idMap result = genMap(lines, DB);
+
+  std::ofstream outDB("database");
+
+  {
+    boost::archive::binary_oarchive oa(outDB);
+    oa << DB;
+  }
   return result;
 }
