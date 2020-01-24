@@ -6,28 +6,65 @@
 
 // standard headers
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <map>
+
+typedef std::map<std::string, std::string> PermutermIndex;
+typedef PermutermIndex::iterator PIpair;
+
+
 
 int main()
 {
-	/*
-	std::vector<std::string> vec = {"word", "?word", "word-word", "word/word", "4eva", "69"};
-	for (auto i = vec.begin(); i != vec.end(); i++)
+	// runPI();
+	// std::ifstream in("InvertedIndex");
+	// PermutermIndex pi = generatePI(in);
+
+	std::vector<std::string> testkeys = {"jesus", "aard", "chernobyl", "aardvark", "cherno"};
+	std::vector<std::string> testvalues = {"this", "This", "than", "is", "smaller"};
+	PermutermIndex testindex;
+
+	for (size_t i = 0; i != testkeys.size(); i++)
 	{
-		std::cout << (::wordIsValid(*i) ? "True" : "False") << std::endl;
+		testindex[testkeys[i]] = testvalues[i];
 	}
 
-	std::string str = "hello$";
-	std::cout << str << std::endl;
-	while (*(str.begin()) != '$')
+	// std::vector<std::string>::iterator found;
+	// found = std::find_if(testkeys.begin(), testkeys.end(), [&](std::pair<std::string, std::string> s){ return s.first >= "cher"; });
+	// std::cout << *found << std::endl;
+
+	// we try to find all elements that match cher*
+	PIpair begin, end;
+	begin = std::find_if(testindex.begin(), testindex.end(), [&](std::pair<std::string, std::string> s){ return s.first >= "cher"; });
+	end = std::find_if(testindex.begin(), testindex.end(), [&](std::pair<std::string, std::string> s){ return s.first >= "ches"; });
+	// we should get cherno and chernobyl
+	for (auto ptr = begin; ptr != end; ptr++)
 	{
-		str = permuterm_rotate(str);
-		std::cout << str << std::endl;
+		std::cout << ptr->first << " " << ptr->second << std::endl;
+	}
+
+
+	/*
+	PIpair begin, end;
+	std::pair<PIpair, PIpair> equal_ptr;
+	begin = pi.lower_bound("n$m");
+	end = pi.upper_bound("m");
+	equal_ptr = pi.equal_range("n$m");
+
+	if (end != pi.end()) std::cout << "FUCKYOU!" << std::endl;
+	if (begin != pi.end()) std::cout << "FUCKYOU2222!" << std::endl;
+	if (equal_ptr.first != pi.end()) std::cout << "FUCKYOU3333!" << std::endl;
+
+	for (auto it = begin; it != end; it++)
+	{
+		std::cout << it->first << std::endl;
 	}
 	*/
 
-	runPI();
+
 
 	return 0;
 }

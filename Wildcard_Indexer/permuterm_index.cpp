@@ -42,7 +42,7 @@ bool wordIsValid(std::string& s)
 		return false;
 	}
 	// false if word contains any non-letter characters except the hyphen
-	else if (std::any_of(s.begin(), s.end(), [](unsigned char c){return (std::ispunct(c) &&  c != '-');}))
+	else if (std::any_of(s.begin(), s.end(), [](unsigned char c){return !(std::isalnum(c) ||  c == '-');}))
 	{
 		return false;
 	}
@@ -50,11 +50,30 @@ bool wordIsValid(std::string& s)
 }
 
 // this function does one move of the rotation
-std::string permuterm_rotate(std::string& s)
+std::string permuterm_rotate(std::string s)
 {
-	std::string res(s, 1, s.size()-1);
-	res.push_back(*(s.begin()));
-	return res;
+	std::rotate(s.begin(), s.begin() + 1, s.end());
+	return s;
+}
+
+// this function takes the search term and rotates it s.t. 
+// the star is at the end of the word.
+std::string search_rotate(std::string& s)
+{
+	// for now we only consider examples with one star
+	if (std::count(s.begin(), s.end(), '*') > 1)
+	{
+		std::string res;
+		return res;
+	}
+	else
+	{
+		s.push_back('$');
+		std::rotate(s.begin(), 
+			std::find(s.begin(), s.end(), '*') + 1,
+			s.end());
+		return s;
+	}
 }
 
 
