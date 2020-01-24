@@ -24,6 +24,7 @@
 typedef std::map<int, std::vector<int> > postingsList;
 typedef std::map<std::string, postingsList> InvertedIndex;
 typedef std::map<std::string, std::string> PermutermIndex; // maps a permuterm to a term
+typedef PermutermIndex::iterator PIpair;
 
 
 int glob_counter = 0;
@@ -74,6 +75,26 @@ std::string search_rotate(std::string& s)
 			s.end());
 		return s;
 	}
+}
+
+std::vector<std::string> star_retrieve(std::string& s, PermutermIndex& pi)
+{
+	// find pointer to first element in range
+	std::string sbeg = s.substr(0, s.size() - 1);
+	PIpair begin = std::find_if(pi.begin(), pi.end(), [&](std::pair<std::string, std::string> scomp){ return scomp.first >= sbeg; });
+	std::cout << "Word: " << sbeg << "\tFirst Element: " << begin->first << " => " << begin->second << std::endl;
+	// find pointer to first element out of range
+	std::string send = sbeg.substr(0, sbeg.size());
+	send[send.size() - 1] = send.back() + 1;
+	PIpair end = std::find_if(pi.begin(), pi.end(), [&](std::pair<std::string, std::string> scomp){ return scomp.first >= send; });
+	std::cout << "Word: " << send << "\tLast Element: " << end->first << " => " << end->second << std::endl;
+	// fill resulting vector with all values in range
+	std::vector<std::string> result;
+	for (auto it = begin; it != end; it++)
+	{
+		result.push_back(it->second);
+	}
+	return result;
 }
 
 

@@ -20,9 +20,14 @@ typedef PermutermIndex::iterator PIpair;
 int main()
 {
 	// runPI();
-	// std::ifstream in("InvertedIndex");
-	// PermutermIndex pi = generatePI(in);
+	std::ifstream in("InvertedIndex");
+	PermutermIndex pi = generatePI(in);
+	std::string what = "*m";
+	std::string query = search_rotate(what);
+	std::vector<std::string> result = star_retrieve(query, pi);
+	//for (auto word: result) std::cout << word << std::endl;
 
+	/*
 	std::vector<std::string> testkeys = {"jesus", "aard", "chernobyl", "aardvark", "cherno"};
 	std::vector<std::string> testvalues = {"this", "This", "than", "is", "smaller"};
 	PermutermIndex testindex;
@@ -46,8 +51,6 @@ int main()
 		std::cout << ptr->first << " " << ptr->second << std::endl;
 	}
 
-
-	/*
 	PIpair begin, end;
 	std::pair<PIpair, PIpair> equal_ptr;
 	begin = pi.lower_bound("n$m");
