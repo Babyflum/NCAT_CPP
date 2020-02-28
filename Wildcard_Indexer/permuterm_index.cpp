@@ -160,3 +160,76 @@ void runPI()
 	}
 	std::cout << "\n\nCounter: " << counter << "\nGlobCounter: " << glob_counter << std::endl;
 }
+
+std::vector<std::string> filter_words(std::vector<std::string>& vec, std::string& seq)
+{
+	std::vector<std::string> result;
+	for (auto word: vec)
+	{
+		if (std::search(word.begin(), word.end(), seq.begin(), seq.end()) != word.end())
+		{
+			result.push_back(word);
+		}
+	}
+	return result;
+}
+
+std::vector<std::string> star_search(std::string& s, PermutermIndex& pi)
+{
+	std::vector<std::string> result;
+	int count = std::count(s.begin(), s.end(), '*');
+	// if there is only one star, do normal star_retrieve
+	if (count == 1)
+	{
+		std::string query = search_rotate(s);
+		result = star_retrieve(query, pi);
+	}
+	// for two stars, we have to check different possible scenarios
+	else if (count == 2)
+	{
+		if (s[0] == '*' && s.back() == '*')
+		{
+			// *w*; this case is unsolved
+			;
+		}
+		else if (s[0] == '*')
+		{
+			// *w*w
+			std::string sequence(s.begin() + 1, s.end());
+			std::string::iterator sep = std::find(sequence.begin(), sequence.end(), '*');
+			std::string first(sequence.begin(), sep);
+			std::string second(sep, sequence.end());
+
+			std::string query = search_rotate(second);
+			result = star_retrieve(query, pi);
+			result = filter_words(result, first);
+		}
+		else if (s.back() == '*')
+		{
+			// w*w*
+			std::string sequence(s.begin(), s.end() - 1);
+			std::string::iterator sep = std::find(sequence.begin(), sequence.end(), '*');
+			std::string first(sequence.begin(), sep + 1);
+			std::string second(sep + 1, sequence.end());
+
+			std::string query = search_rotate(first);
+			result = star_retrieve(query, pi);
+			result = filter_words(result, second);
+		}
+		else
+		{
+			// w*w*w
+			std::string::iterator sep1 = std::find(s.begin(), s.end(), '*');
+			std::string::iterator sep2 = std::find(sep1, s.end(), '*');
+			std::string first(s.begin(), sep1);
+			std::string second(sep1 + 1, sep2);
+			std::string third(sep2 + 2, s.end());
+
+			std::string query = first + "*" + third;
+			query = search_rotate(query);
+			result = star_retrieve(query, pi);
+			result = filter_words(result, second);
+		}
+	}
+	return result;
+}
