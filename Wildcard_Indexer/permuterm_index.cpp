@@ -189,8 +189,10 @@ std::vector<std::string> star_search(std::string& s, PermutermIndex& pi)
 	{
 		if (s[0] == '*' && s.back() == '*')
 		{
-			// *w*; this case is unsolved
-			;
+			// *w*
+			std::string query(s.begin() + 1, s.end() - 1);
+			query = query + "*";
+			result = star_retrieve(query, pi);
 		}
 		else if (s[0] == '*')
 		{
@@ -220,10 +222,10 @@ std::vector<std::string> star_search(std::string& s, PermutermIndex& pi)
 		{
 			// w*w*w
 			std::string::iterator sep1 = std::find(s.begin(), s.end(), '*');
-			std::string::iterator sep2 = std::find(sep1, s.end(), '*');
+			std::string::iterator sep2 = std::find(sep1 + 1, s.end(), '*');
 			std::string first(s.begin(), sep1);
 			std::string second(sep1 + 1, sep2);
-			std::string third(sep2 + 2, s.end());
+			std::string third(sep2 + 1, s.end());
 
 			std::string query = first + "*" + third;
 			query = search_rotate(query);

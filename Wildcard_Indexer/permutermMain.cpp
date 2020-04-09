@@ -22,7 +22,7 @@ int main()
 	// runPI();
 	std::ifstream in("InvertedIndex");
 	PermutermIndex pi = generatePI(in);
-	std::string what = "a*b*c";
+	std::string what = "*in*";
 	// std::string query = search_rotate(what);
 	// std::vector<std::string> result = star_retrieve(query, pi);
 	std::vector<std::string> result = star_search(what, pi);
