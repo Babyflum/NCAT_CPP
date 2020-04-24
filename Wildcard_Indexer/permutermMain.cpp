@@ -22,12 +22,18 @@ int main()
 	// runPI();
 	std::ifstream in("InvertedIndex");
 	PermutermIndex pi = generatePI(in);
-	std::string what = "*in*";
-	// std::string query = search_rotate(what);
-	// std::vector<std::string> result = star_retrieve(query, pi);
-	std::vector<std::string> result = star_search(what, pi);
-	for (auto word: result) std::cout << word << std::endl;
-
+	
+	while (true)
+	{
+		std::string what;
+		std::cin >> what;
+		if (what == "") break;
+		// std::string what = "de*s*ing";
+		// std::string query = search_rotate(what);
+		// std::vector<std::string> result = star_retrieve(query, pi);
+		std::vector<std::string> result = star_search(what, pi);
+		for (auto word: result) std::cout << word << std::endl;
+	}
 	/*
 	std::vector<std::string> testkeys = {"jesus", "aard", "chernobyl", "aardvark", "cherno"};
 	std::vector<std::string> testvalues = {"this", "This", "than", "is", "smaller"};

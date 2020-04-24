@@ -143,6 +143,12 @@ PermutermIndex generatePI(std::ifstream& in)
 		step++;
 	}
 
+	std::ofstream outpi("PermutermIndex");
+  	{
+    	boost::archive::binary_oarchive oa(outpi);
+    	oa << pi;
+  	}
+
 	return pi;
 }
 
