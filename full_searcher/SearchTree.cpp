@@ -22,6 +22,7 @@
 const char* ops[5] = {"AND", "OR", "NOT", "NEAR", "WITHIN"};
 typedef std::map<int, std::vector<int> > postingsList;
 typedef std::map<std::string, postingsList > InvertedIndex;
+typedef std::map<std::string, std::string> PermutermIndex;
 
 
 // empty constructor
@@ -217,6 +218,11 @@ void SearchTree::generate(std::vector<std::string>& query)
     	std::cout << query[i] << " is an exact phrase" << std::endl; 
     	typ = 2;
     }
+    else if (std::any_of(query[i].begin(), query[i].end(), [&](char c){return c == '*';}))
+    {
+      std::cout << query[i] << " is a wildcard term" << std::endl;
+      typ = 6;
+    }
     else
     {
     	std::cout << query[i] << " is a single word" << std::endl; 
@@ -328,7 +334,7 @@ int getOperatorType(std::string& op) {
 
 
 // evaluate the tree
-std::map<int, std::vector<int> > SearchTree::evaluate(InvertedIndex& ii, bool leftbound) 
+std::map<int, std::vector<int> > SearchTree::evaluate(InvertedIndex& ii, PermutermIndex& pi, bool leftbound) 
 {
   std::cout << "Type of current is " << current->type << std::endl;
   std::cout << "Value of current is " << current->key << std::endl;
@@ -379,10 +385,10 @@ std::map<int, std::vector<int> > SearchTree::evaluate(InvertedIndex& ii, bool le
 
     current = current->left;
     std::cout << "Evaluating left subtree." << std::endl;
-    postingsList left = evaluate(ii, true);
+    postingsList left = evaluate(ii, pi, true);
     std::cout << "Evaluating right subtree." << std::endl;
     current = current->parent->right;
-    postingsList right = evaluate(ii, false);
+    postingsList right = evaluate(ii, pi, false);
     std::cout << "Moving in with parents." << std::endl;
     current = current->parent;
     if (op_type == 1)

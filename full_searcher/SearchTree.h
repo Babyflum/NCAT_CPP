@@ -23,7 +23,7 @@ class TreeElement
  // attributes
  private:
   std::string key;
-  int type;  // 1: single term, 2: exact phrase, 3: operator, 4: opening parenthesis, 5: closing parenthesis
+  int type;  // 1: single term, 2: exact phrase, 3: operator, 4: opening parenthesis, 5: closing parenthesis. 6: wildcard term
   TreeElement* parent;
   TreeElement* left;
   TreeElement* right;
@@ -74,7 +74,8 @@ class SearchTree {
   // this method is used for the inputVector-Constructor.
   void generate(std::vector<std::string>&);
   // method to get a positionalPostingsList according to the operator hierarchy
-  std::map<int, std::vector<int> > evaluate(std::map<std::string, std::map<int, std::vector<int> > >&, bool leftbound=true);
+  std::map<int, std::vector<int> > evaluate(std::map<std::string, std::map<int, std::vector<int> > >&, 
+    std::map<std::string, std::string>&, bool leftbound=true);
 };
 
 // declaration of helper functions

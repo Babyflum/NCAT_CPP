@@ -49,6 +49,7 @@ search, as well as a part-of-speech search.
 typedef std::map<int, std::vector<int> > postingsList;
 typedef postingsList::iterator postIt;
 typedef std::vector<int>::iterator VecIt;
+typedef std::map<std::string, std::string> PermutermIndex;
 
 /* 
 this function is used by the BOOLEAN functions and merges 
@@ -299,5 +300,120 @@ postingsList exact_phrase(std::vector<postingsList>& phrase, bool leftbound)
         p++;
     }
   } 
+  return result;
+}
+
+// this function takes the search term and rotates it s.t. 
+// the star is at the end of the word.
+std::string search_rotate(std::string& s)
+{
+  // for now we only consider examples with one star
+  if (std::count(s.begin(), s.end(), '*') > 1)
+  {
+    std::string res;
+    return res;
+  }
+  else
+  {
+    s.push_back('$');
+    std::rotate(s.begin(), 
+      std::find(s.begin(), s.end(), '*') + 1,
+      s.end());
+    return s;
+  }
+}
+
+std::vector<std::string> star_retrieve(std::string& s, PermutermIndex& pi)
+{
+  // find pointer to first element in range
+  std::string sbeg = s.substr(0, s.size() - 1);
+  PIpair begin = std::find_if(pi.begin(), pi.end(), [&](std::pair<std::string, std::string> scomp){ return scomp.first >= sbeg; });
+  std::cout << "Word: " << sbeg << "\tFirst Element: " << begin->first << " => " << begin->second << std::endl;
+  // find pointer to first element out of range
+  std::string send = sbeg.substr(0, sbeg.size());
+  send[send.size() - 1] = send.back() + 1;
+  PIpair end = std::find_if(pi.begin(), pi.end(), [&](std::pair<std::string, std::string> scomp){ return scomp.first >= send; });
+  std::cout << "Word: " << send << "\tLast Element: " << end->first << " => " << end->second << std::endl;
+  // fill resulting vector with all values in range
+  std::vector<std::string> result;
+  for (auto it = begin; it != end; it++)
+  {
+    result.push_back(it->second);
+  }
+  return result;
+}
+
+std::vector<std::string> filter_words(std::vector<std::string>& vec, std::string& seq)
+{
+  std::vector<std::string> result;
+  for (auto word: vec)
+  {
+    if (std::search(word.begin(), word.end(), seq.begin(), seq.end()) != word.end())
+    {
+      result.push_back(word);
+    }
+  }
+  return result;
+}
+
+std::vector<std::string> star_search(std::string& s, PermutermIndex& pi)
+{
+  std::vector<std::string> result;
+  int count = std::count(s.begin(), s.end(), '*');
+  // if there is only one star, do normal star_retrieve
+  if (count == 1)
+  {
+    std::string query = search_rotate(s);
+    result = star_retrieve(query, pi);
+  }
+  // for two stars, we have to check different possible scenarios
+  else if (count == 2)
+  {
+    if (s[0] == '*' && s.back() == '*')
+    {
+      // *w*
+      std::string query(s.begin() + 1, s.end() - 1);
+      query = query + "*";
+      result = star_retrieve(query, pi);
+    }
+    else if (s[0] == '*')
+    {
+      // *w*w
+      std::string sequence(s.begin() + 1, s.end());
+      std::string::iterator sep = std::find(sequence.begin(), sequence.end(), '*');
+      std::string first(sequence.begin(), sep);
+      std::string second(sep, sequence.end());
+
+      std::string query = search_rotate(second);
+      result = star_retrieve(query, pi);
+      result = filter_words(result, first);
+    }
+    else if (s.back() == '*')
+    {
+      // w*w*
+      std::string sequence(s.begin(), s.end() - 1);
+      std::string::iterator sep = std::find(sequence.begin(), sequence.end(), '*');
+      std::string first(sequence.begin(), sep + 1);
+      std::string second(sep + 1, sequence.end());
+
+      std::string query = search_rotate(first);
+      result = star_retrieve(query, pi);
+      result = filter_words(result, second);
+    }
+    else
+    {
+      // w*w*w
+      std::string::iterator sep1 = std::find(s.begin(), s.end(), '*');
+      std::string::iterator sep2 = std::find(sep1 + 1, s.end(), '*');
+      std::string first(s.begin(), sep1);
+      std::string second(sep1 + 1, sep2);
+      std::string third(sep2 + 1, s.end());
+
+      std::string query = first + "*" + third;
+      query = search_rotate(query);
+      result = star_retrieve(query, pi);
+      result = filter_words(result, second);
+    }
+  }
   return result;
 }

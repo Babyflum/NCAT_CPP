@@ -48,6 +48,7 @@ typedef std::map<int, std::vector<int> > postingsList;
 typedef std::map<std::string, postingsList> InvertedIndex;
 typedef postingsList::iterator postIter;
 typedef std::map<int, std::vector<std::string> > idMap;
+typedef std::map<std::string, std::string> PermutermIndex;
 
 
 void printQuery(std::vector<std::string>& query)
@@ -76,7 +77,7 @@ std::string idMaptransformer(std::vector<std::string>& v)
 int main()
 {
 	// load Index
-	std::ifstream in("InvertedIndex");
+	std::ifstream in("InvertedIndex2k");
 	InvertedIndex ii;
 	{
 		std::cout << "Inverted Index loading" << std::endl;
@@ -86,7 +87,7 @@ int main()
 	std::cout << "Inverted Index loaded\n" << std::endl;
 
 	// load idMap
-	std::ifstream inidMap("idMap");
+	std::ifstream inidMap("idMap2k");
 	idMap im;
 	{
 		std::cout << "idMap loading" << std::endl;
@@ -99,22 +100,32 @@ int main()
 	typedef std::map<int, std::string> corpus;
 	typedef corpus::iterator corit;
 	typedef idMap::iterator idMapit;
-	corpus Corpus;
+	// corpus Corpus;
 
-	std::ifstream inDB("database");
+	std::ifstream inDB("database2k");
 	corpus DB;
 	{
 		std::cout << "Database loading" << std::endl;
 		boost::archive::binary_iarchive ia(inDB);
 		ia >> DB;
 	}
-	std::cout << "Inverted Index loaded\n" << std::endl;
+	std::cout << "Database loaded\n" << std::endl;
 
+	std::ifstream inPI("PermutermIndex2k");
+	PermutermIndex PI;
+	{
+		std::cout << "PermutermIndex loading" << std::endl;
+		boost::archive::binary_iarchive ia(inPI);
+		ia >> PI;
+	}
+	std::cout << "PermutermIndex loaded\n" << std::endl;
+
+	/*
 	for (idMapit j = im.begin(); j != im.end(); j++)
 	{
 		Corpus[j->first] = idMaptransformer(j->second);
 	}
-
+	*/
 
 	while (true)
 	{
@@ -145,7 +156,7 @@ int main()
 		std::cout << "\nGenerating Search Tree" << std::endl;
 		st.generate(processed_query);
 		std::cout << "\nEvaluating search tree" << std::endl;
-		result = st.evaluate(ii);
+		result = st.evaluate(ii, PI);
 		if (result.empty()) std::cout << "Nothing to see here" << std::endl;
 		else
 		{ 
@@ -157,8 +168,10 @@ int main()
 			while (counter != 5 && postbegit != postendit)
 			{
 				std::cout << "Term contained " << (postbegit->second).size() << " time(s) in document " << postbegit->first << std::endl;
-				std::cout << "\n" << Corpus[postbegit->first] << std::endl;
+				// std::cout << "Corpus PRINT" << std::endl;
+				// std::cout << "\n" << Corpus[postbegit->first] << std::endl;
 				std::cout << "\n" << std::endl;
+				std::cout << "Database PRINT" << std::endl;
 				std::cout << DB[postbegit->first] << std::endl;
 				std::cout << "\n" << std::endl;
 				counter++;
