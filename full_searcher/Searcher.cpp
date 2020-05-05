@@ -37,6 +37,7 @@ search, as well as a part-of-speech search.
 
 // project headers
 #include "./Searcher.h"
+#include "./RetrievePostings.h"
 
 // standard headers
 #include <map>
@@ -47,9 +48,11 @@ search, as well as a part-of-speech search.
 
 
 typedef std::map<int, std::vector<int> > postingsList;
+typedef std::map<std::string, postingsList > InvertedIndex;
 typedef postingsList::iterator postIt;
 typedef std::vector<int>::iterator VecIt;
 typedef std::map<std::string, std::string> PermutermIndex;
+typedef PermutermIndex::iterator PIpair;
 
 /* 
 this function is used by the BOOLEAN functions and merges 
@@ -414,6 +417,20 @@ std::vector<std::string> star_search(std::string& s, PermutermIndex& pi)
       result = star_retrieve(query, pi);
       result = filter_words(result, second);
     }
+  }
+  return result;
+}
+
+postingsList wildcard_retrieve(std::string& wildcard_term, InvertedIndex& ii, PermutermIndex& pi)
+{
+  // retrieve all matching terms from the permuterm index  
+  std::vector<std::string> wildcard_matches = star_search(wildcard_term, pi);
+  // combine docIDs for all matches
+  postingsList result;
+  for (int i = 0; i != wildcard_matches.size(); i++)
+  {
+    postingsList loop = retrieve(wildcard_matches[i], ii);
+    result = unionize(loop, result);
   }
   return result;
 }

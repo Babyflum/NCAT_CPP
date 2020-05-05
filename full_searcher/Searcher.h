@@ -29,3 +29,6 @@ std::vector<std::string> star_retrieve(std::string&, std::map<std::string, std::
 std::vector<std::string> star_search(std::string&, std::map<std::string, std::string>&);
 // ____________________________________________________________
 std::vector<std::string> filter_words(std::vector<std::string>&, std::string&);
+// ____________________________________________________________
+std::map<int, std::vector<int> > wildcard_retrieve(std::string&, std::map<std::string, std::map<int, std::vector<int> > >&, 
+	std::map<std::string, std::string>&);

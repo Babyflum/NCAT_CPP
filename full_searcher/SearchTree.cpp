@@ -364,6 +364,11 @@ std::map<int, std::vector<int> > SearchTree::evaluate(InvertedIndex& ii, Permute
     std::cout << "exact_phrase() ran succesfully." << std::endl;
     return result;
   } 
+  else if (current->type == 6)
+  {
+    postingsList result = ::wildcard_retrieve(current->key, ii, pi);
+    return result;
+  }
   else if (current->type == 3) 
   {
     std::cout << current->key << " is recognized as an operator." << std::endl;
