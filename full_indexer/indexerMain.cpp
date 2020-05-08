@@ -30,16 +30,16 @@ int main()
   std::map<int, std::vector<std::string> > idMap;
   try 
   { 
-    idMap = RunMain("post2.csv");
+    idMap = RunMain("./csv_files/post_0-1M.csv");
   } 
   catch (const std::domain_error e) 
   {
-    std::cout << "Caught an error" << std::endl;
+    std::cout << "Can't find file" << std::endl;
     return 1;
   }
 
   // serialize idMap to binary file
-  std::ofstream outidMap("idMap");
+  std::ofstream outidMap("idMap1M");
 
   {
     boost::archive::binary_oarchive oa(outidMap);
@@ -57,7 +57,7 @@ int main()
   // idMap.~map();
 
   // serialize index to binary file
-  std::ofstream outii("InvertedIndex");
+  std::ofstream outii("InvertedIndex1M");
 
   {
     boost::archive::binary_oarchive oa(outii);

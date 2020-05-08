@@ -9,3 +9,4 @@
 #include <string>
 
 std::map<std::string, std::map<int, std::vector<int> > > generateIndex(std::map<int, std::vector<std::string> >&);
+bool interesting_term(std::string&);

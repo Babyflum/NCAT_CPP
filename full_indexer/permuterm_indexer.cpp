@@ -28,26 +28,64 @@ typedef PermutermIndex::iterator PIpair;
 
 
 int glob_counter = 0;
+int ratio_counter = 0;
+
+// this function gives the length of the longest set of consecutive letters
+int consecutive_letters(std::string& s)
+{
+	int longest = 0;
+	int current = 1;
+	std::string::iterator step = s.begin();
+	char compare = '$'; 
+
+	while (step != s.end())
+	{
+		if (*step == compare)
+		{
+			current++;
+		}
+		else
+		{
+			if (current > longest)
+			{
+			    longest = current;
+			}
+			compare = *step;
+			current = 1;
+		}
+		step++;
+	}
+	if (current > longest)
+	{
+		longest = current;
+	}
+	return longest;
+}
 
 // function that checks whether term is a real word or not
 bool wordIsValid(std::string& s)
 {
-	// false if word is longer than 30 characters
-	if (s.size() > 30)
+	// no numbers are allowed
+	if (std::any_of(s.begin(), s.end(), [](char c){return std::isdigit(c);}))
 	{
 		return false;
 	}
-	// false if word contains only numbers
-	else if (std::all_of(s.begin(), s.end(), [](unsigned char c){return std::isdigit(c);}))
+	// no more than two consecutive letters are the same
+	else if (consecutive_letters(s) > 2)
 	{
 		return false;
 	}
-	// false if word contains any non-letter characters except the hyphen
-	else if (std::any_of(s.begin(), s.end(), [](unsigned char c){return !(std::isalnum(c) ||  c == '-');}))
+	// characters are either alphabetical or hyphens
+	else if (std::any_of(s.begin(), s.end(), [](char c){return !(std::isalpha(c) || c == '-');}))
 	{
 		return false;
 	}
-	else return true;
+	// if we have a hyphen, it cannot be at the beginning or the end of a word
+	else if (!(std::isalpha(s[0]) && std::isalpha(s[s.size() - 1])))
+	{
+		return false;
+	}
+	return true;
 }
 
 
@@ -84,6 +122,7 @@ PermutermIndex generatePI(InvertedIndex& ii)
 		}
 		else
 		{
+			std::cout << "Term is valid" << std::endl;
 			std::string str = term + "$";
 			pi[str] = term;
 			while (*(str.begin()) != '$')
@@ -91,15 +130,18 @@ PermutermIndex generatePI(InvertedIndex& ii)
 				str = permuterm_rotate(str);
 				pi[str] = term;
 			}
+			ratio_counter++;
 		}
 		step++;
 	}
 
-	std::ofstream outpi("PermutermIndex");
+	std::ofstream outpi("PermutermIndex1M");
   	{
     	boost::archive::binary_oarchive oa(outpi);
     	oa << pi;
   	}
+  	float ratio = (ratio_counter/glob_counter) * 100;
+  	std::cout << "Permuterm Index contains " << ratio << " % of all terms" << std::endl;
 
 	return pi;
 }

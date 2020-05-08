@@ -60,7 +60,7 @@ std::vector<std::string> lineToVec(std::string& str)
 
 
 /* 
-read a .csv file and store the lines as elements in a list
+read a .csv file and store the lines as elements in a vector
 the elements are vectors containing the columns as elements
 this uses the lineToVec function 
 */
@@ -205,7 +205,7 @@ idMap RunMain(std::string name)
 
   idMap result = genMap(lines, DB);
 
-  std::ofstream outDB("database");
+  std::ofstream outDB("database1M");
 
   {
     boost::archive::binary_oarchive oa(outDB);
